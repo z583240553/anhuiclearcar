@@ -112,10 +112,13 @@ function _M.decode(payload)
 
 			--依次读入上传的数据
 			for i=1,(templen-7)/2,1 do
-				packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
+				if(i==5) then
+					packet[ status_cmds[i] ] = (bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2))/100
+				else
+					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
+				end
 			end
-
-			packet[status_cmds[5]] = packet[status_cmds[5]]/100
+			
 			--[[
 			--将上传的数据转化为JSON格式数据 上传协议中前5个状态寄存器数据
 			packet[ status_cmds[1] ] = databuff_table[1]/100
