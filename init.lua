@@ -114,6 +114,7 @@ function _M.decode(payload)
 			for i=1,(templen-7)/2,1 do
 				if(i==5) then
 					packet[ status_cmds[i] ] = (bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2))/100
+					return "dot little"
 				else
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
