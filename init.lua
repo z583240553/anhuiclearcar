@@ -113,7 +113,7 @@ function _M.decode(payload)
 			--依次读入上传的数据
 			for i=1,(templen-7)/2,1 do
 				if(i==5) then
-					packet[ status_cmds[i] ] = (bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2))/100
+					packet[ status_cmds[i] ] =  getnumber(10+i*2) 
 				else
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
