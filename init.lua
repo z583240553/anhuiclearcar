@@ -117,9 +117,11 @@ function _M.decode(payload)
 				else
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
-				if(i==1) then --特殊情况 电流高低位反了
+				--[[
+				if(i==1) then --特殊情况 rtu板里采集电流高低位反了
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(11+i*2) , 8 ) + getnumber(10+i*2)
 				end
+				]]
 			end
 
 		end
