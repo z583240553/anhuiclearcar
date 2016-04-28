@@ -117,61 +117,10 @@ function _M.decode(payload)
 				else
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
-				
-				if(i == 1) then --特殊情况,电流高低位反了
-					packet[ status_cmds[i] ] = "29"
+				if(i==1) then --特殊情况 电流高低位反了
+					packet[ status_cmds[i] ] = bit.lshift( getnumber(11+i*2) , 8 ) + getnumber(10+i*2)
 				end
 			end
-			
-			--[[
-			--将上传的数据转化为JSON格式数据 上传协议中前5个状态寄存器数据
-			packet[ status_cmds[1] ] = databuff_table[1]/100
-			packet[ status_cmds[2] ] = databuff_table[2]-20
-			packet[ status_cmds[3] ] = databuff_table[3]
-			packet[ status_cmds[4] ] = databuff_table[4]
-			packet[ status_cmds[5] ] = databuff_table[5]/10
-			--]]
-			--[[
-			--解析运行状态1(对应高字节databuff_table[26],低字节databuff_table[27])的每个bit位值
-			for i=0,1,1 do --两个字节
-				for j=1,8,1 do
-					-- j-1的意思是，由于j从1开始，但是移位操作应该从1左移0位，所以减一
-					bitbuff_table[i*2+j] = bit.band(databuff_table[27-i],bit.lshift(1,j-1))
-				end
-			end
-			--将运行状态1的每位bit值转化为JSON格式数据
-			packet[ status_cmds[11] ] = bitbuff_table[1]
-			packet[ status_cmds[12] ] = bitbuff_table[2]
-			packet[ status_cmds[13] ] = bitbuff_table[4]
-			packet[ status_cmds[14] ] = bitbuff_table[5]
-			packet[ status_cmds[15] ] = bitbuff_table[6]
-			packet[ status_cmds[16] ] = bitbuff_table[7]
-			packet[ status_cmds[17] ] = bitbuff_table[8]
-			packet[ status_cmds[18] ] = bitbuff_table[9]
-			packet[ status_cmds[19] ] = bitbuff_table[10]
-			packet[ status_cmds[20] ] = bitbuff_table[15]
-			packet[ status_cmds[21] ] = bitbuff_table[16]
-
-			--解析运行状态2(对应高字节databuff_table[28],低字节databuff_table[29])的每个bit位值
-			for i=0,1,1 do --两个字节
-				for j=1,8,1 do
-					-- j-1的意思是，由于j从1开始，但是移位操作应该从1左移0位，所以减一
-					bitbuff_table[i*2+j] = bit.band(databuff_table[29-i],bit.lshift(1,j-1))
-				end
-			end
-			--将运行状态2的每位bit值转化为JSON格式数据
-			packet[ status_cmds[22] ] = bitbuff_table[1]
-			packet[ status_cmds[23] ] = bitbuff_table[2]
-			packet[ status_cmds[24] ] = bitbuff_table[4]
-			packet[ status_cmds[25] ] = bitbuff_table[5]
-			packet[ status_cmds[26] ] = bitbuff_table[6]
-			packet[ status_cmds[27] ] = bitbuff_table[7]
-			packet[ status_cmds[28] ] = bitbuff_table[8]
-			packet[ status_cmds[29] ] = bitbuff_table[9]
-			packet[ status_cmds[30] ] = bitbuff_table[14]
-			packet[ status_cmds[31] ] = bitbuff_table[15]
-			packet[ status_cmds[32] ] = bitbuff_table[16]
-		--]]
 
 		end
 
