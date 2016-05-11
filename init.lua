@@ -14,7 +14,7 @@ local cmds = {
   [4] = "device_address"
 }
 
---Json的Key，用于清洁车云端显示状态
+--Json的Key，用于清洁车云端显示状态，电流 电压 温度等
 local status_cmds = {
   [1] = "MotorCurrent",
   [2] = "MotorControllerTemp",
@@ -24,6 +24,21 @@ local status_cmds = {
   [6] = "SpeedGrade",
   [7] = "AcceleratorModel",
   [8] = "DriveStatus"
+}
+
+--Json的Key，用于清洁车云端显示状态，RFID卡号 服务时间  清洗时间 经纬度地址
+local other_cmds = {
+  [1] = "RFIDCardID",
+  [2] = "ServiceTimeYear",
+  [3] = "ServiceTimeMonth",
+  [4] = "ServiceTimeDay",
+  [5] = "ServiceTimeHour",
+  [6] = "CleanTimeYear",
+  [7] = "CleanTimeMonth",
+  [8] = "CleanTimeDay",
+  [9] = "CleanTimeHour"            --传递小时数以0.5小时为单位
+  [10] = "Longitude",              --经度位置
+  [11] = "Latitude"                --纬度位置
 }
 
 --FCS校验
@@ -102,13 +117,10 @@ function _M.decode(payload)
 		end--]]
 		--func为判断是 实时数据/参数/故障 的参数
 		local func = getnumber(10)
-		if func == 1 then  --解析状态数据
+		if func == 0x01 then  --解析状态数据
 			--packet[ cmds[3] ] = 'func-status'
 			--设备modbus地址
 			--packet[ cmds[4] ] = getnumber(11)
-
-			--local databuff_table={} --用来暂存上传的实际状态数据
-			--local bitbuff_table={}  --用来暂存运行状态1/2的每位bit值
 
 			--依次读入上传的数据
 			for i=1,(templen-7)/2,1 do
@@ -117,13 +129,39 @@ function _M.decode(payload)
 				else
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
-				--[[
-				if(i==1) then --特殊情况 rtu板里采集电流高低位反了
-					packet[ status_cmds[i] ] = bit.lshift( getnumber(11+i*2) , 8 ) + getnumber(10+i*2)
-				end
-				]]
 			end
 
+		else if func == 0x02 then  --解析故障数据
+				--备用
+		else if func == 0x03 then  --解析参数1数据
+				--备用
+		else if func == 0x04 then  --解析参数2数据 RFID卡号
+			local databuff_table={} --用来暂存RFID中每位BYTE的低四位
+			local RFIDCardID = 0
+			for i=1,8,1 do
+				databuff_table[i] = bit.band(getnumber(11+i),0x0f)
+				RFIDCardID = RFIDCardID+ bit.lshift(databuff_table[i],(8-i)*4)
+			end
+			packet[other_cmds[1]] = RFIDCardID
+
+		else if func == 0x14 then  --解析参数3数据 服务清洗时间
+			for i=1,8,1 do
+				if i==8 then
+					packet[other_cmds[1+i]] = getnumber(11+i)*0.5  --清洗时间数据以0.5小时为单位
+				else
+					packet[other_cmds[1+i]] = getnumber(11+i)
+				end
+			end
+
+		else if func == 0x15 then  --解析参数4数据 经纬度地址
+			local Longitude_buff = {} --经度
+			local Latitude_buff = {}  --纬度
+			for i=1,8,1 do
+				table.insert(Longitude_buff,string.char(getnumber(11+i)))
+				table.insert(Latitude_buff,string.char(getnumber(19+i)))
+			end
+			packet[other_cmds[10]] = Longitude_buff
+			packet[other_cmds[11]] = Latitude_buff
 		end
 
 	else
