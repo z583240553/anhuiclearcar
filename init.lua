@@ -141,7 +141,6 @@ function _M.decode(payload)
 	]]
 	
 		if func == 0x04 then  --解析参数2数据 RFID卡号
-			packet['test'] = 5678
 			local databuff_table={} --用来暂存RFID中每位BYTE的低四位
 			local RFIDcardid =0
 			for i=1,8,1 do
