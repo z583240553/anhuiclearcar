@@ -166,10 +166,8 @@ function _M.decode(payload)
 			local Longitude_buff = {} --经度
 			local Latitude_buff = {}  --纬度
 			for i=1,8,1 do
-				--table.insert(Longitude_buff,string.char(getnumber(11+i)))
-				--table.insert(Latitude_buff,string.char(getnumber(19+i)))
-				table.insert(Longitude_buff,getnumber(11+i))
-				table.insert(Latitude_buff,getnumber(19+i))
+				table.insert(Longitude_buff,string.char(getnumber(11+i)))
+				table.insert(Latitude_buff,string.char(getnumber(19+i)))
 			end
 			packet[other_cmds[10]] = Longitude_buff
 			packet[other_cmds[11]] = Latitude_buff
