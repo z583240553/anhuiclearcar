@@ -130,39 +130,7 @@ function _M.decode(payload)
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
 			end
-
-		else if func == 0x02 then  --解析故障数据
-				--备用
-		else if func == 0x03 then  --解析参数1数据
-				--备用
-		else if func == 0x04 then  --解析参数2数据 RFID卡号
-			local databuff_table={} --用来暂存RFID中每位BYTE的低四位
-			local RFIDCardID = 0
-			for i=1,8,1 do
-				databuff_table[i] = bit.band(getnumber(11+i),0x0f)
-				RFIDCardID = RFIDCardID+ bit.lshift(databuff_table[i],(8-i)*4)
-			end
-			packet[other_cmds[1]] = RFIDCardID
-
-		else if func == 0x14 then  --解析参数3数据 服务清洗时间
-			for i=1,8,1 do
-				if i==8 then
-					packet[other_cmds[1+i]] = getnumber(11+i)*0.5  --清洗时间数据以0.5小时为单位
-				else
-					packet[other_cmds[1+i]] = getnumber(11+i)
-				end
-			end
-
-		else if func == 0x15 then  --解析参数4数据 经纬度地址
-			packet['test'] = 0x15
-			local Longitude_buff = {} --经度
-			local Latitude_buff = {}  --纬度
-			for i=1,8,1 do
-				table.insert(Longitude_buff,string.char(getnumber(11+i)))
-				table.insert(Latitude_buff,string.char(getnumber(19+i)))
-			end
-			packet[other_cmds[10]] = Longitude_buff
-			packet[other_cmds[11]] = Latitude_buff
+	
 		end
 
 	else
