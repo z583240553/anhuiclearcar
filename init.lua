@@ -14,7 +14,7 @@ local cmds = {
   [4] = "device_address"
 }
 
---Json的Key，用于清洁车云端显示状态，电流 电压 温度等
+--Json的Key，用于清洁车云端显示状态
 local status_cmds = {
   [1] = "MotorCurrent",
   [2] = "MotorControllerTemp",
@@ -24,21 +24,6 @@ local status_cmds = {
   [6] = "SpeedGrade",
   [7] = "AcceleratorModel",
   [8] = "DriveStatus"
-}
-
---Json的Key，用于清洁车云端显示状态，RFID卡号 服务时间  清洗时间 经纬度地址
-local other_cmds = {
-  [1] = "RFIDCardID",
-  [2] = "ServiceTimeYear",
-  [3] = "ServiceTimeMonth",
-  [4] = "ServiceTimeDay",
-  [5] = "ServiceTimeHour",
-  [6] = "CleanTimeYear",
-  [7] = "CleanTimeMonth",
-  [8] = "CleanTimeDay",
-  [9] = "CleanTimeHour"            --传递小时数以0.5小时为单位
-  [10] = "Longitude",              --经度位置
-  [11] = "Latitude"                --纬度位置
 }
 
 --FCS校验
@@ -117,10 +102,13 @@ function _M.decode(payload)
 		end--]]
 		--func为判断是 实时数据/参数/故障 的参数
 		local func = getnumber(10)
-		if func == 0x01 then  --解析状态数据
+		if func == 1 then  --解析状态数据
 			--packet[ cmds[3] ] = 'func-status'
 			--设备modbus地址
 			--packet[ cmds[4] ] = getnumber(11)
+
+			--local databuff_table={} --用来暂存上传的实际状态数据
+			--local bitbuff_table={}  --用来暂存运行状态1/2的每位bit值
 
 			--依次读入上传的数据
 			for i=1,(templen-7)/2,1 do
@@ -129,8 +117,13 @@ function _M.decode(payload)
 				else
 					packet[ status_cmds[i] ] = bit.lshift( getnumber(10+i*2) , 8 ) + getnumber(11+i*2)
 				end
+				--[[
+				if(i==1) then --特殊情况 rtu板里采集电流高低位反了
+					packet[ status_cmds[i] ] = bit.lshift( getnumber(11+i*2) , 8 ) + getnumber(10+i*2)
+				end
+				]]
 			end
-	
+
 		end
 
 	else
