@@ -151,15 +151,15 @@ function _M.decode(payload)
 	--		packet[other_cmds[1]] = RFIDcardid
 	--	end
 	
-	--	if func == 0x14 then  --解析参数3数据 服务清洗时间
-	--		for i=1,8,1 do
-	--			if i==8 then
-	--				packet[other_cmds[1+i]] = getnumber(11+i)  --清洗时间数据以0.5小时为单位
-	--			else
-	--				packet[other_cmds[1+i]] = getnumber(11+i)
-	--			end
-	--		end
-	--	end
+		if func == 0x14 then  --解析参数3数据 服务清洗时间
+			for i=1,8,1 do
+				if i==8 then
+					packet[other_cmds[1+i]] = getnumber(11+i) 
+				else
+					packet[other_cmds[1+i]] = getnumber(11+i)
+				end
+			end
+		end
 		
 		
 		if func == 0x15 then  --解析参数4数据 经纬度地址
