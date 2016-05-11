@@ -162,17 +162,18 @@ function _M.decode(payload)
 	--	end
 		
 		
-	--	if func == 0x15 then  --解析参数4数据 经纬度地址
-	--		packet['test'] = 0x15
-	--		local Longitude_buff = {} --经度
-	--		local Latitude_buff = {}  --纬度
-	--		for i=1,8,1 do
-	--			table.insert(Longitude_buff,string.char(getnumber(11+i)))
-	--			table.insert(Latitude_buff,string.char(getnumber(19+i)))
-	--		end
-	--		packet[other_cmds[10]] = Longitude_buff
-	--		packet[other_cmds[11]] = Latitude_buff
-	--	end
+		if func == 0x15 then  --解析参数4数据 经纬度地址
+			packet['test'] = 0x15
+			local Longitude_buff = {} --经度
+			local Latitude_buff = {}  --纬度
+			for i=1,8,1 do
+				table.insert(Longitude_buff,string.char(getnumber(11+i)))
+				table.insert(Latitude_buff,string.char(getnumber(19+i)))
+			end
+			packet['test0'] = 0x15
+			packet[other_cmds[10]] = Longitude_buff
+			packet[other_cmds[11]] = Latitude_buff
+		end
 	
 	else
 		packet['head_error'] = 'error'
