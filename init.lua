@@ -85,8 +85,6 @@ function _M.decode(payload)
 	--当帧头符合，才进行其他位的解码工作
 	if ( (head1 == 0x3B) and (head2 == 0x31) ) then
 
-					local databuff_table={} --用来暂存RFID中每位BYTE的低四位
-			local RFIDcardid =0
 		--数据长度
 		local templen = bit.lshift( getnumber(3) , 8 ) + getnumber(4)
 
@@ -142,17 +140,18 @@ function _M.decode(payload)
 		end 
 	]]
 	
-	--	if func == 0x04 then  --解析参数2数据 RFID卡号
-	--
-	--		for i=1,8,1 do
-	--			databuff_table[i] = bit.band(getnumber(11+i),0x0f)
-	--			RFIDcardid = RFIDcardid+ bit.lshift(databuff_table[i],(8-i)*4)
-	--		end
-	--		packet[other_cmds[1]] = RFIDcardid
-	--	end
+		if func == 0x04 then  --解析参数2数据 RFID卡号
+			packet['test'] = 5678
+			local databuff_table={} --用来暂存RFID中每位BYTE的低四位
+			local RFIDcardid =0
+			for i=1,8,1 do
+				databuff_table[i] = bit.band(getnumber(11+i),0x0f)
+				RFIDcardid = RFIDcardid+ bit.lshift(databuff_table[i],(8-i)*4)
+			end
+			packet[other_cmds[1]] = RFIDcardid
+		end
 	
 		if func == 0x14 then  --解析参数3数据 服务清洗时间
-			packet['test'] = 1234
 			for i=1,8,1 do
 				if i==8 then
 					packet[other_cmds[1+i]] = getnumber(11+i) 
