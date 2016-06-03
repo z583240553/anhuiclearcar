@@ -153,7 +153,7 @@ function _M.decode(payload)
 		if func == 0x14 then  --解析参数3数据 服务清洗时间
 			for i=1,8,1 do
 				if i==8 then
-					packet[other_cmds[1+i]] = getnumber(11+i) 
+					packet[other_cmds[1+i]] = getnumber(11+i)/2
 				else
 					packet[other_cmds[1+i]] = getnumber(11+i)
 				end
