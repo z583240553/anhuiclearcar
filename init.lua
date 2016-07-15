@@ -29,16 +29,10 @@ local status_cmds = {
 --Json的Key，用于清洁车云端显示状态，RFID卡号 服务时间  清洗时间 经纬度地址
 local other_cmds = {
   [1] = "RFIDCardID",
-  [2] = "ServiceTimeYear",
-  [3] = "ServiceTimeMonth",
-  [4] = "ServiceTimeDay",
-  [5] = "ServiceTimeHour",
-  [6] = "CleanTimeYear",
-  [7] = "CleanTimeMonth",
-  [8] = "CleanTimeDay",
-  [9] = "CleanTimeHour",           --传递小时数以0.5小时为单位
-  [10] = "Longitude",              --经度位置
-  [11] = "Latitude"                --纬度位置
+  [2] = "ServiceTime",
+  [3] = "CleanTime",              --传递小时数以0.5小时为单位
+  [4] = "Longitude",              --经度位置
+  [5] = "Latitude"                --纬度位置
 }
 
 --FCS校验
@@ -151,13 +145,16 @@ function _M.decode(payload)
 		end
 	
 		if func == 0x14 then  --解析参数3数据 服务清洗时间
+			local data_buff = {} 
 			for i=1,8,1 do
 				if i==8 then
-					packet[other_cmds[1+i]] = getnumber(11+i)/2
+					data_buff[i] = getnumber(11+i)/2
 				else
-					packet[other_cmds[1+i]] = getnumber(11+i)
+					data_buff[i] = getnumber(11+i)
 				end
 			end
+			packet[other_cmds[2]] = data_buff[1]..'年'..data_buff[2]..'月'..data_buff[3]..'日'..data_buff[4]..'时'  --服务时间
+			packet[other_cmds[3]] = data_buff[5]..'年'..data_buff[6]..'月'..data_buff[7]..'日'..data_buff[8]..'时'  --清洗时间
 		end
 		
 		
@@ -168,8 +165,8 @@ function _M.decode(payload)
 				table.insert(Longitude_buff,string.char(getnumber(11+i)))
 				table.insert(Latitude_buff,string.char(getnumber(19+i)))
 			end
-			packet[other_cmds[10]] = Longitude_buff
-			packet[other_cmds[11]] = Latitude_buff
+			packet[other_cmds[4]] = Longitude_buff
+			packet[other_cmds[5]] = Latitude_buff
 		end
 	
 	else
